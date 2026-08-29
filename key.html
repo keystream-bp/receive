@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NHẬN KEY</title>
+<style>
+  :root {
+    --accent: #7c5cff;
+    --accent2: #22d3ee;
+    --bg1: #0b0f1f;
+    --bg2: #131735;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.10);
+    --text: #eef1ff;
+    --muted: #8b93b8;
+    --green: #22c55e;
+    --red: #f87171;
+  }
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body {
+    font-family: 'Segoe UI', system-ui, Arial, sans-serif;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(124,92,255,0.25), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(34,211,238,0.18), transparent 45%),
+      linear-gradient(160deg, var(--bg1), var(--bg2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    color: var(--text);
+  }
+
+  .wrap { width: 100%; max-width: 420px; }
+
+  .header { text-align:center; margin-bottom: 22px; }
+  .header .logo {
+    width: 64px; height: 64px; margin: 0 auto 14px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 8px 28px rgba(124,92,255,0.4);
+  }
+  .header .logo svg { width:30px; height:30px; color:#fff; }
+  .header h1 { font-size: 1.35rem; font-weight: 700; }
+  .header p { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
+
+  .key-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .key-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--accent), var(--accent2));
+  }
+
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .live-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .live-dot.off {
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red);
+    animation: none;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+
+  .key-box {
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: 0.5px;
+    color: #0b0f1f;
+    background: linear-gradient(135deg, #fde68a, #fbbf24);
+    padding: 16px 14px;
+    border-radius: 12px;
+    margin: 4px 0 16px;
+    word-break: break-all;
+    text-align: center;
+    box-shadow: 0 6px 18px rgba(251,191,36,0.25);
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .key-box.empty {
+    color: var(--muted);
+    background: rgba(255,255,255,0.04);
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: none;
+  }
+  .key-box.flash {
+    animation: flashKey 0.7s ease;
+  }
+  @keyframes flashKey {
+    0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
+    50% { box-shadow: 0 0 0 12px rgba(34,197,94,0); }
+    100% { box-shadow: 0 6px 18px rgba(251,191,36,0.25); }
+  }
+
+  .copy-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 16px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    background: linear-gradient(135deg, var(--green), #16a34a);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(34,197,94,0.35);
+    transition: transform 0.15s, filter 0.15s;
+  }
+  .copy-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
+  .copy-btn:active { transform: translateY(0); }
+  .copy-btn.copied {
+    background: linear-gradient(135deg, var(--accent2), #06b6d4);
+  }
+  .copy-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .copy-btn svg { width: 18px; height: 18px; }
+
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: -80px;
+    transform: translateX(-50%);
+    background: #1f2447;
+    border: 1px solid rgba(34,197,94,0.35);
+    color: #86efac;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    transition: bottom 0.35s ease;
+    z-index: 60;
+  }
+  .toast.show { bottom: 26px; }
+
+
+  .home-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 16px;
+    margin-top: 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.15s, filter 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .home-btn:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    background: rgba(124,92,255,0.12);
+  }
+  .home-btn:active { transform: translateY(0); }
+  .home-btn svg { width: 18px; height: 18px; }
+
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <div class="header">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3-3.5 3.5zm0 0L19 4"/></svg>
+    </div>
+    <h1>NHẬN KEY</h1>
+    <p>Key của bạn</p>
+  </div>
+
+  <div class="key-card">
+    <div class="status-row">
+      <span class="live-dot" id="liveDot"></span>
+      <span id="statusText">Trạng thái</span>
+    </div>
+
+    <div class="key-box empty" id="keyBox">Đang tải...</div>
+
+    <button class="copy-btn" id="copyBtn" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Sao chép Key
+    </button>
+
+    <a class="home-btn" href="https://hgggvcokokok-glitch.github.io/ihggvg/" id="homeBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Về trang chủ
+    </a>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">Đã sao chép key!</div>
+
+<script>
+  function getKeyFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    // Lấy raw query để giữ ký tự đặc biệt, ưu tiên param "id"
+    let key = params.get("id");
+    if (key === null) {
+      // fallback: nếu URL dạng ?KEY (không có tên param)
+      const q = window.location.search.slice(1);
+      if (q && !q.includes("=")) key = decodeURIComponent(q);
+    }
+    return (key || "").trim();
+  }
+
+  const keyBox = document.getElementById("keyBox");
+  const copyBtn = document.getElementById("copyBtn");
+  const liveDot = document.getElementById("liveDot");
+  const statusText = document.getElementById("statusText");
+  const toast = document.getElementById("toast");
+
+  let currentKey = "";
+
+  function render() {
+    currentKey = getKeyFromUrl();
+
+    if (!currentKey) {
+      keyBox.textContent = "Thiếu key trong URL";
+      keyBox.classList.add("empty");
+      liveDot.classList.add("off");
+      statusText.textContent = "Chưa có key";
+      copyBtn.disabled = true;
+      return;
+    }
+
+    keyBox.textContent = currentKey;
+    keyBox.classList.remove("empty");
+    liveDot.classList.remove("off");
+    statusText.textContent = "Có key";
+    copyBtn.disabled = false;
+  }
+
+  let toastTimer = null;
+  copyBtn.addEventListener("click", async () => {
+    if (!currentKey) return;
+    try {
+      await navigator.clipboard.writeText(currentKey);
+    } catch (e) {
+      const ta = document.createElement("textarea");
+      ta.value = currentKey;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+    keyBox.classList.add("flash");
+    setTimeout(() => keyBox.classList.remove("flash"), 700);
+    copyBtn.classList.add("copied");
+    copyBtn.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+      Đã sao chép!
+    `;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.remove("show");
+      copyBtn.classList.remove("copied");
+      copyBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Sao chép Key
+      `;
+    }, 2000);
+  });
+
+  render();
+</script>
+
+</body>
+</html>
